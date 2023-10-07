@@ -1,2 +1,26 @@
 # DnTBot
 Bot for dungeons-and-trolls
+
+
+**Installation**
+
+To install the bot, you will need to have Python 3 installed. Once you have it, you can create a virtual environment:
+
+```
+python3 -m venv venv
+```
+
+Once the virtual environment is created, you can activate it and install the bot's dependencies:
+
+```
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Usage**
+
+* Add your api key to the .env file
+* Run the bot with 
+```
+python3 play.py
+```
