@@ -2,49 +2,67 @@
 # oggpnosn
 # hkhr
 import requests
-import time
+import logging
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-GAME_END_POINT = "https://docker.tivvit.cz/v1"
-
+GAME_END_POINT = os.getenv("HOST")
+API_KEY = os.getenv("API_KEY")
 
 class Game:
-    def __init__(self, bot):
-        self.bot = bot
-        self.register_bot_()
+    def __init__(self, api_key):
+        self.api_key_ = api_key
 
-    def register_bot_(self):
+    def move(self, x, y):
+        payload = {"positionX": x,
+                   "positionY": y
+                   }
+        resp = requests.post(GAME_END_POINT + "/move",
+                             json=payload, headers={'X-API-KEY': self.api_key_})
+        logging.debug("Status code: " + str(resp.status_code))
+        logging.debug("Server response: " + str(resp.json()))
+
+    def yell(self, what_to_yell):
         payload = {
-            "username": self.bot.get_name()
+            "text": what_to_yell
         }
-        r = requests.post(GAME_END_POINT + "/register", data=payload)
-        print(r.status_code)
-        print(r.text)
-        return ""
+        resp = requests.post(GAME_END_POINT + "/yell",
+                             json=payload, headers={'X-API-KEY': self.api_key_})
+        logging.debug("Status code: " + str(resp.status_code))
+        logging.debug("Server response: " + str(resp.json()))
 
-    def get_current_state(self):
-        r = requests.get(GAME_END_POINT + "/game")
-        return r.json()
+    def get_game_state(self):
+        resp = requests.get(GAME_END_POINT + "/game",
+                            headers={'X-API-KEY': self.api_key_})
+        return resp.json()
 
-    def play(self):
-        while True:
-            current_state = self.get_current_state()
-            actions = self.bot.act(current_state)
-            time.sleep(2)
+    def buy(self, obj_ids):
+        payload = {
+            "ids": obj_ids
+        }
+        resp = requests.post(GAME_END_POINT + "/buy",
+                             json=payload, headers={'X-API-KEY': self.api_key_})
+        logging.info("Status code: " + str(resp.status_code))
+        logging.info("Server response: " + str(resp.json()))
 
-class Bot:
-    def get_name(self):
-        return "tanay"
-
-    def act(self, current_state):
-        print(current_state)
-
-    def register(self):
-        pass
-
-bot = Bot()
-game = Game(bot)
-game.play()
-
+    def pick_up(self, object_id):
+        payload = {
+            "id": object_id
+        }
+        resp = requests.post(GAME_END_POINT + "/pick-up",
+                             json=payload, headers={'X-API-KEY': self.api_key_})
+        logging.debug("Status code: " + str(resp.status_code))
+        logging.debug("Server response: " + str(resp.json()))
 
 
+
+logging.basicConfig(level=logging.INFO)
+game = Game(API_KEY)
+game.move(1, 1)
+# game.yell("life is enjoy")
+# game.move(4, 2)
+# print(game.get_game_state())
+
+# game.buy(["1", "2"])
